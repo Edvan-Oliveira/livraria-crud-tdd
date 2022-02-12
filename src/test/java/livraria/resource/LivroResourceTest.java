@@ -50,7 +50,7 @@ public class LivroResourceTest {
         given(livroService.cadastrar(livroParSerSalvo)).willReturn(livroSalvo);
         given(livroMapper.converterParaLivroGetResponse(livroSalvo)).willReturn(livroGetResponse);
 
-        String livroPostRequestJSON = new ObjectMapper().writeValueAsString(livroPostRequest);
+        String livroPostRequestJSON = converterParaJSON(livroPostRequest);
 
         MockHttpServletRequestBuilder requisicao = post(URL_API)
                 .accept(APPLICATION_JSON)
@@ -79,5 +79,9 @@ public class LivroResourceTest {
 
     private LivroGetResponse obterLivroGetResponse() {
         return LivroGetResponse.builder().id(ID).titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
+    }
+
+    private String converterParaJSON(Object objeto) throws Exception {
+        return new ObjectMapper().writeValueAsString(objeto);
     }
 }
