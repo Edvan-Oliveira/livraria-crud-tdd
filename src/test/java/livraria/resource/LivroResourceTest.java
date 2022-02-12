@@ -7,11 +7,13 @@ import livraria.domain.request.LivroPostRequest;
 import livraria.domain.request.LivroPutRequest;
 import livraria.domain.response.LivroGetResponse;
 import livraria.service.LivroService;
+import livraria.service.exception.ISBNDuplicadoException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(LivroResource.class)
 public class LivroResourceTest {
 
+    private static final String ISBN_DUPLICADO = "ISBN já cadastrado";
     private static final String URL_API = "/livros";
     private static final Integer ID = 5;
     private static final String TITULO = "Livro Bom";
@@ -65,6 +68,30 @@ public class LivroResourceTest {
                 .andExpect(jsonPath("titulo").value(TITULO))
                 .andExpect(jsonPath("autor").value(AUTOR))
                 .andExpect(jsonPath("isbn").value(ISBN));
+    }
+
+    @Test
+    @DisplayName("Deve lançar a exceção ISBNDuplicadoException ao tentar cadastrar um livro com ISBN já cadastrado.")
+    void cadastrarLivroComISBNExistente() throws Exception {
+        Livro livroParaSerSalvo = obterLivroSemID();
+        LivroPostRequest livroPostRequest = obterLivroPostRequest();
+
+        given(livroMapper.converterParaLivro(livroPostRequest)).willReturn(livroParaSerSalvo);
+        given(livroService.cadastrar(livroParaSerSalvo)).willThrow(new ISBNDuplicadoException(ISBN_DUPLICADO));
+
+        String livroPostRequestJSON = converterParaJSON(livroPostRequest);
+
+        MockHttpServletRequestBuilder requisicao = post(URL_API)
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .content(livroPostRequestJSON);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("caminho").value(URL_API))
+                .andExpect(jsonPath("status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("mensagem").value(ISBN_DUPLICADO))
+                .andExpect(jsonPath("momento").isNotEmpty());
     }
 
     @Test
