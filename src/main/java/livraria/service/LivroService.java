@@ -9,4 +9,8 @@ public class LivroService {
     public Livro cadastrar(Livro livro) {
         return null;
     }
+
+    public Livro atualizar(Livro livro) {
+        return null;
+    }
 }
