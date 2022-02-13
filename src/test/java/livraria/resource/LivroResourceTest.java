@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -89,7 +89,7 @@ public class LivroResourceTest {
         mvc.perform(requisicao)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("caminho").value(URL_API))
-                .andExpect(jsonPath("status").value(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("status").value(BAD_REQUEST.value()))
                 .andExpect(jsonPath("mensagem").value(ISBN_DUPLICADO))
                 .andExpect(jsonPath("momento").isNotEmpty());
     }
@@ -119,7 +119,31 @@ public class LivroResourceTest {
                 .andExpect(jsonPath("titulo").value(TITULO))
                 .andExpect(jsonPath("autor").value(AUTOR))
                 .andExpect(jsonPath("isbn").value(ISBN));
+    }
 
+    @Test
+    @DisplayName("Deve lançar a exceção ISBNDuplicadoException ao tentar atualizar um livro com ISBN já cadastrado.")
+    void atualizarLivroComISBNExistente() throws Exception {
+        Livro livroParaSerAtualizado = obterLivroComID();
+        LivroPutRequest livroPutRequest = obterLivroPutRequest();
+
+        given(livroMapper.converterParaLivro(livroPutRequest)).willReturn(livroParaSerAtualizado);
+        given(livroService.atualizar(livroParaSerAtualizado)).willThrow(new ISBNDuplicadoException(ISBN_DUPLICADO));
+
+        String caminhoDaRequisicao = URL_API.concat("/").concat(ID.toString());
+        String livroPutRequestJSON = converterParaJSON(livroPutRequest);
+
+        MockHttpServletRequestBuilder requisicao = put(caminhoDaRequisicao)
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .content(livroPutRequestJSON);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("caminho").value(caminhoDaRequisicao))
+                .andExpect(jsonPath("status").value(BAD_REQUEST.value()))
+                .andExpect(jsonPath("mensagem").value(ISBN_DUPLICADO))
+                .andExpect(jsonPath("momento").isNotEmpty());
     }
 
     private Livro obterLivroSemID() {
