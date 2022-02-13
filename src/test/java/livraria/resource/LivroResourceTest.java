@@ -183,6 +183,24 @@ public class LivroResourceTest {
                 .andExpect(jsonPath("[1].isbn").value(OUTRO_ISBN));
     }
 
+    @Test
+    @DisplayName("Deve retornar uma lista vazia.")
+    void listarTodosComListaVazia() throws Exception {
+        List<Livro> listaDeLivrosVazia = List.of();
+        List<LivroGetResponse> listaDeLivroGetResponseVazia = List.of();
+
+        given(livroService.listarTodos()).willReturn(listaDeLivrosVazia);
+        given(livroMapper.converterParaListaDeLivroGetResponse(listaDeLivrosVazia))
+                .willReturn(listaDeLivroGetResponseVazia);
+
+        MockHttpServletRequestBuilder requisicao = get(URL_API)
+                .accept(APPLICATION_JSON);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
