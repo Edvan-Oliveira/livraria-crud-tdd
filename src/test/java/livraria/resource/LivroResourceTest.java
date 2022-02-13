@@ -134,6 +134,31 @@ public class LivroResourceTest {
     }
 
     @Test
+    @DisplayName("Deve lancar a exceção ConteudoNaoEncontradoException ao tentar atualizar um livro que não existe.")
+    void atualizarLivroInexsistente() throws Exception {
+        Livro livroParaSerAtualizado = obterLivroComID();
+        LivroPutRequest livroPutRequest = obterLivroPutRequest();
+
+        given(livroMapper.converterParaLivro(livroPutRequest)).willReturn(livroParaSerAtualizado);
+        given(livroService.atualizar(livroParaSerAtualizado))
+                .willThrow(new ConteudoNaoEncontradoException(LIVRO_NAO_ENCONTRADO));
+
+        String livroPutRequestJSON = converterParaJSON(livroPutRequest);
+
+        MockHttpServletRequestBuilder requisicao = put(URL_API_ID)
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .content(livroPutRequestJSON);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("caminho").value(URL_API_ID))
+                .andExpect(jsonPath("status").value(BAD_REQUEST.value()))
+                .andExpect(jsonPath("mensagem").value(LIVRO_NAO_ENCONTRADO))
+                .andExpect(jsonPath("momento").isNotEmpty());
+    }
+
+    @Test
     @DisplayName("Deve lançar a exceção ISBNDuplicadoException ao tentar atualizar um livro com ISBN já cadastrado.")
     void atualizarLivroComISBNExistente() throws Exception {
         Livro livroParaSerAtualizado = obterLivroComID();
