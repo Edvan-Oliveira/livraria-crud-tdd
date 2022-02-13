@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class LivroResourceTest {
 
     private static final String ISBN_DUPLICADO = "ISBN já cadastrado";
-    private static final String URL_API = "/livros";
+
     private static final Integer ID = 5;
     private static final String TITULO = "Livro Bom";
     private static final String AUTOR = "Fulano";
@@ -40,6 +40,9 @@ public class LivroResourceTest {
     private static final String OUTRO_TITULO = "Livro Ótimo";
     private static final String OUTRO_AUTOR = "Ciclano";
     private static final String OUTRO_ISBN = "654";
+
+    private static final String URL_API = "/livros";
+    private static final String URL_API_ID = URL_API.concat("/").concat(ID.toString());
 
     @MockBean
     private LivroService livroService;
@@ -115,7 +118,7 @@ public class LivroResourceTest {
 
         String livroPutRequestJSON = converterParaJSON(livroPutRequest);
 
-        MockHttpServletRequestBuilder requisicao = put(URL_API.concat("/").concat(ID.toString()))
+        MockHttpServletRequestBuilder requisicao = put(URL_API_ID)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(livroPutRequestJSON);
@@ -137,17 +140,16 @@ public class LivroResourceTest {
         given(livroMapper.converterParaLivro(livroPutRequest)).willReturn(livroParaSerAtualizado);
         given(livroService.atualizar(livroParaSerAtualizado)).willThrow(new ISBNDuplicadoException(ISBN_DUPLICADO));
 
-        String caminhoDaRequisicao = URL_API.concat("/").concat(ID.toString());
         String livroPutRequestJSON = converterParaJSON(livroPutRequest);
 
-        MockHttpServletRequestBuilder requisicao = put(caminhoDaRequisicao)
+        MockHttpServletRequestBuilder requisicao = put(URL_API_ID)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(livroPutRequestJSON);
 
         mvc.perform(requisicao)
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("caminho").value(caminhoDaRequisicao))
+                .andExpect(jsonPath("caminho").value(URL_API_ID))
                 .andExpect(jsonPath("status").value(BAD_REQUEST.value()))
                 .andExpect(jsonPath("mensagem").value(ISBN_DUPLICADO))
                 .andExpect(jsonPath("momento").isNotEmpty());
@@ -199,6 +201,26 @@ public class LivroResourceTest {
         mvc.perform(requisicao)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    @DisplayName("Deve buscar livro por ID com sucesso.")
+    void bsucarPorID() throws Exception {
+        Livro livroQueSeraRetornado = obterLivroComID();
+        LivroGetResponse livroGetResponse = obterLivroGetResponse();
+
+        given(livroService.buscarPorID(ID)).willReturn(livroQueSeraRetornado);
+        given(livroMapper.converterParaLivroGetResponse(livroQueSeraRetornado)).willReturn(livroGetResponse);
+
+        MockHttpServletRequestBuilder requisicao = get(URL_API_ID)
+                .accept(APPLICATION_JSON);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(ID))
+                .andExpect(jsonPath("titulo").value(TITULO))
+                .andExpect(jsonPath("autor").value(AUTOR))
+                .andExpect(jsonPath("isbn").value(ISBN));
     }
 
     private Livro obterLivroSemID() {

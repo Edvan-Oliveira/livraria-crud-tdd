@@ -20,6 +20,8 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/livros")
 public class LivroResource {
 
+    private static final String URL_ID = "/{id}";
+
     private final LivroService livroService;
     private final LivroMapper livroMapper;
 
@@ -29,7 +31,7 @@ public class LivroResource {
         return ResponseEntity.status(CREATED).body(livroMapper.converterParaLivroGetResponse(livro));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(URL_ID)
     public ResponseEntity<LivroGetResponse> atualizar(@PathVariable Integer id,
                                                       @RequestBody LivroPutRequest livroPutRequest) {
         livroPutRequest.setId(id);
@@ -41,5 +43,10 @@ public class LivroResource {
     public ResponseEntity<List<LivroGetResponse>> listarTodos() {
         return ResponseEntity.status(OK)
                 .body(livroMapper.converterParaListaDeLivroGetResponse(livroService.listarTodos()));
+    }
+
+    @GetMapping(URL_ID)
+    public ResponseEntity<LivroGetResponse> buscarPorID(@PathVariable Integer id) {
+        return ResponseEntity.status(OK).body(livroMapper.converterParaLivroGetResponse(livroService.buscarPorID(id)));
     }
 }

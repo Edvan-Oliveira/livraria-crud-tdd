@@ -19,4 +19,8 @@ public class LivroService {
     public List<Livro> listarTodos() {
         return null;
     }
+
+    public Livro buscarPorID(Integer id) {
+        return null;
+    }
 }
