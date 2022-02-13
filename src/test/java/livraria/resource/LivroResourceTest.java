@@ -7,6 +7,7 @@ import livraria.domain.request.LivroPostRequest;
 import livraria.domain.request.LivroPutRequest;
 import livraria.domain.response.LivroGetResponse;
 import livraria.service.LivroService;
+import livraria.service.exception.ConteudoNaoEncontradoException;
 import livraria.service.exception.ISBNDuplicadoException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class LivroResourceTest {
 
     private static final String ISBN_DUPLICADO = "ISBN já cadastrado";
+    private static final String LIVRO_NAO_ENCONTRADO = "Livro não encontrado";
 
     private static final Integer ID = 5;
     private static final String TITULO = "Livro Bom";
@@ -221,6 +223,22 @@ public class LivroResourceTest {
                 .andExpect(jsonPath("titulo").value(TITULO))
                 .andExpect(jsonPath("autor").value(AUTOR))
                 .andExpect(jsonPath("isbn").value(ISBN));
+    }
+
+    @Test
+    @DisplayName("Deve lançar a exceção ConteudoNaoEncontradoException ao tentar buscar por ID de um livro que não existe.")
+    void buscarPorIDLivroInexistente() throws Exception {
+        given(livroService.buscarPorID(ID)).willThrow(new ConteudoNaoEncontradoException(LIVRO_NAO_ENCONTRADO));
+
+        MockHttpServletRequestBuilder requisicao = get(URL_API_ID)
+                .accept(APPLICATION_JSON);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("caminho").value(URL_API_ID))
+                .andExpect(jsonPath("status").value(BAD_REQUEST.value()))
+                .andExpect(jsonPath("mensagem").value(LIVRO_NAO_ENCONTRADO))
+                .andExpect(jsonPath("momento").isNotEmpty());
     }
 
     private Livro obterLivroSemID() {
