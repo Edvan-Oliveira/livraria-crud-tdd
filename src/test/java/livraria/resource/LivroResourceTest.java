@@ -16,11 +16,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import java.util.List;
+
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,6 +35,11 @@ public class LivroResourceTest {
     private static final String TITULO = "Livro Bom";
     private static final String AUTOR = "Fulano";
     private static final String ISBN = "123";
+
+    private static final Integer OUTRO_ID = 8;
+    private static final String OUTRO_TITULO = "Livro Ótimo";
+    private static final String OUTRO_AUTOR = "Ciclano";
+    private static final String OUTRO_ISBN = "654";
 
     @MockBean
     private LivroService livroService;
@@ -146,6 +153,36 @@ public class LivroResourceTest {
                 .andExpect(jsonPath("momento").isNotEmpty());
     }
 
+    @Test
+    @DisplayName("Deve listar todos os livros no cenário de uma lista populada.")
+    void listarTodos() throws Exception {
+        Livro primeiroLivro = obterLivroComID();
+        Livro segundoLivro = obterOutroLivroComID();
+        List<Livro> listaDeLivros = List.of(primeiroLivro, segundoLivro);
+
+        LivroGetResponse primeiroLivroGetResponse = obterLivroGetResponse();
+        LivroGetResponse segundoLivroGetResponse = obterOutroLivroGetResponse();
+        List<LivroGetResponse> listaDeLivroGetResponse = List.of(primeiroLivroGetResponse, segundoLivroGetResponse);
+
+        given(livroService.listarTodos()).willReturn(listaDeLivros);
+        given(livroMapper.converterParaListaDeLivroGetResponse(listaDeLivros)).willReturn(listaDeLivroGetResponse);
+
+        MockHttpServletRequestBuilder requisicao = get(URL_API)
+                .accept(APPLICATION_JSON);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("[0].id").value(ID))
+                .andExpect(jsonPath("[0].titulo").value(TITULO))
+                .andExpect(jsonPath("[0].autor").value(AUTOR))
+                .andExpect(jsonPath("[0].isbn").value(ISBN))
+                .andExpect(jsonPath("[1].id").value(OUTRO_ID))
+                .andExpect(jsonPath("[1].titulo").value(OUTRO_TITULO))
+                .andExpect(jsonPath("[1].autor").value(OUTRO_AUTOR))
+                .andExpect(jsonPath("[1].isbn").value(OUTRO_ISBN));
+    }
+
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
@@ -168,5 +205,13 @@ public class LivroResourceTest {
 
     private String converterParaJSON(Object objeto) throws Exception {
         return new ObjectMapper().writeValueAsString(objeto);
+    }
+
+    private Livro obterOutroLivroComID() {
+        return Livro.builder().id(OUTRO_ID).titulo(OUTRO_TITULO).autor(OUTRO_AUTOR).isbn(OUTRO_ISBN).build();
+    }
+
+    private LivroGetResponse obterOutroLivroGetResponse() {
+        return LivroGetResponse.builder().id(OUTRO_ID).titulo(OUTRO_TITULO).autor(OUTRO_AUTOR).isbn(OUTRO_ISBN).build();
     }
 }

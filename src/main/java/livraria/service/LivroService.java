@@ -3,6 +3,8 @@ package livraria.service;
 import livraria.domain.entity.Livro;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class LivroService {
 
@@ -11,6 +13,10 @@ public class LivroService {
     }
 
     public Livro atualizar(Livro livro) {
+        return null;
+    }
+
+    public List<Livro> listarTodos() {
         return null;
     }
 }

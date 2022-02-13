@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -33,5 +35,11 @@ public class LivroResource {
         livroPutRequest.setId(id);
         Livro livro = livroService.atualizar(livroMapper.converterParaLivro(livroPutRequest));
         return ResponseEntity.status(OK).body(livroMapper.converterParaLivroGetResponse(livro));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<LivroGetResponse>> listarTodos() {
+        return ResponseEntity.status(OK)
+                .body(livroMapper.converterParaListaDeLivroGetResponse(livroService.listarTodos()));
     }
 }
