@@ -34,7 +34,7 @@ public class LivroResource {
 
     @PutMapping(URL_ID)
     public ResponseEntity<LivroGetResponse> atualizar(@PathVariable Integer id,
-                                                      @RequestBody LivroPutRequest livroPutRequest) {
+                                                      @Valid @RequestBody LivroPutRequest livroPutRequest) {
         livroPutRequest.setId(id);
         Livro livro = livroService.atualizar(livroMapper.converterParaLivro(livroPutRequest));
         return ResponseEntity.status(OK).body(livroMapper.converterParaLivroGetResponse(livro));
