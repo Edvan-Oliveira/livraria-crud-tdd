@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -32,6 +32,10 @@ public class LivroResourceTest {
 
     private static final String ISBN_DUPLICADO = "ISBN já cadastrado";
     private static final String LIVRO_NAO_ENCONTRADO = "Livro não encontrado";
+
+    private static final String TITULO_OBRIGATORIO = "titulo é obrigatório";
+    private static final String AUTOR_OBRIGATORIO = "autor é obrigatório";
+    private static final String ISBN_OBRIGATORIO = "isbn é obrigatório";
 
     private static final Integer ID = 5;
     private static final String TITULO = "Livro Bom";
@@ -80,6 +84,27 @@ public class LivroResourceTest {
                 .andExpect(jsonPath("titulo").value(TITULO))
                 .andExpect(jsonPath("autor").value(AUTOR))
                 .andExpect(jsonPath("isbn").value(ISBN));
+    }
+
+    @Test
+    @DisplayName("Deve lançar uma um erro de validação ao tentar cadastrar um livro com dados insuficientes.")
+    void cadastrarLivroComDadosInsuficientes() throws Exception {
+        LivroPostRequest livroPostRequestVazio = new LivroPostRequest();
+        String livroPostRequestVazioJSON = converterParaJSON(livroPostRequestVazio);
+
+        MockHttpServletRequestBuilder requisicao = post(URL_API)
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .content(livroPostRequestVazioJSON);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("caminho").value(URL_API))
+                .andExpect(jsonPath("status").value(BAD_REQUEST.value()))
+                .andExpect(jsonPath("mensagem", containsString(TITULO_OBRIGATORIO)))
+                .andExpect(jsonPath("mensagem", containsString(AUTOR_OBRIGATORIO)))
+                .andExpect(jsonPath("mensagem", containsString(ISBN_OBRIGATORIO)))
+                .andExpect(jsonPath("momento").isNotEmpty());
     }
 
     @Test

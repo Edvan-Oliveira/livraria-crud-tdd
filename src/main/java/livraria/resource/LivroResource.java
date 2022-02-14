@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
@@ -26,7 +27,7 @@ public class LivroResource {
     private final LivroMapper livroMapper;
 
     @PostMapping
-    public ResponseEntity<LivroGetResponse> cadastrar(@RequestBody LivroPostRequest livroPostRequest) {
+    public ResponseEntity<LivroGetResponse> cadastrar(@RequestBody @Valid LivroPostRequest livroPostRequest) {
         Livro livro = livroService.cadastrar(livroMapper.converterParaLivro(livroPostRequest));
         return ResponseEntity.status(CREATED).body(livroMapper.converterParaLivroGetResponse(livro));
     }
