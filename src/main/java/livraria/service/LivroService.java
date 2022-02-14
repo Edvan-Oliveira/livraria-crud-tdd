@@ -23,4 +23,7 @@ public class LivroService {
     public Livro buscarPorID(Integer id) {
         return null;
     }
+
+    public void deletar(Integer id) {
+    }
 }

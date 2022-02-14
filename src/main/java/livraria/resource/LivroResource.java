@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -49,5 +48,11 @@ public class LivroResource {
     @GetMapping(URL_ID)
     public ResponseEntity<LivroGetResponse> buscarPorID(@PathVariable Integer id) {
         return ResponseEntity.status(OK).body(livroMapper.converterParaLivroGetResponse(livroService.buscarPorID(id)));
+    }
+
+    @DeleteMapping(URL_ID)
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+        livroService.deletar(id);
+        return ResponseEntity.status(NO_CONTENT).body(null);
     }
 }
