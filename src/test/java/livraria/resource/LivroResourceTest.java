@@ -21,8 +21,8 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.verify;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -319,12 +319,25 @@ public class LivroResourceTest {
     @Test
     @DisplayName("Deve deletar um livro com sucesso.")
     void deletar() throws Exception {
-        doNothing().when(livroService).deletar(ID);
+        willDoNothing().given(livroService).deletar(ID);
 
         MockHttpServletRequestBuilder requisicao = delete(URL_API_ID);
 
         mvc.perform(requisicao)
                 .andExpect(status().isNoContent());
+
+        verify(livroService, times(1)).deletar(ID);
+    }
+
+    @Test
+    @DisplayName("Deve lançar a exceção ConteudoNaoEncontradoException ao tentar deletar um livro que não existe.")
+    void deletarLivroInexistente() throws Exception {
+        willThrow(new ConteudoNaoEncontradoException(LIVRO_NAO_ENCONTRADO)).given(livroService).deletar(ID);
+
+        MockHttpServletRequestBuilder requisicao = delete(URL_API_ID);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isBadRequest());
 
         verify(livroService, times(1)).deletar(ID);
     }
