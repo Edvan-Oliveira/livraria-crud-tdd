@@ -165,6 +165,15 @@ class LivroServiceTest {
         verify(livroRepository, times(1)).delete(livroSalvo);
     }
 
+    @Test
+    @DisplayName("Deve lançar a exceção ConteudoNaoEncontradoException ao tentar deletar um livro que não existe.")
+    void deletarLivroInexistente() {
+        given(livroRepository.findById(ID)).willReturn(Optional.empty());
+        assertThatThrownBy(() -> livroService.deletar(ID))
+                .isInstanceOf(ConteudoNaoEncontradoException.class)
+                .hasMessage(LIVRO_NAO_ENCONTRADO);
+    }
+
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
