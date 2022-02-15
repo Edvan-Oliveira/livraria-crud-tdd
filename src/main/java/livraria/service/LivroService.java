@@ -2,6 +2,7 @@ package livraria.service;
 
 import livraria.domain.entity.Livro;
 import livraria.repository.LivroRepository;
+import livraria.service.exception.ISBNDuplicadoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,8 @@ public class LivroService {
     private final LivroRepository livroRepository;
 
     public Livro cadastrar(Livro livro) {
+        if (livroRepository.existsByIsbn(livro.getIsbn()))
+            throw new ISBNDuplicadoException("ISBN já cadastrado");
         return livroRepository.save(livro);
     }
 
