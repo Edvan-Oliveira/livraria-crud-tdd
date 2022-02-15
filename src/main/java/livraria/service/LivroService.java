@@ -21,7 +21,7 @@ public class LivroService {
     }
 
     public Livro atualizar(Livro livro) {
-        return null;
+        return livroRepository.save(livro);
     }
 
     public List<Livro> listarTodos() {

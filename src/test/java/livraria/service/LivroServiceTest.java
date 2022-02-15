@@ -59,6 +59,23 @@ class LivroServiceTest {
                 .hasMessage(ISBN_DUPLICADO);
     }
 
+    @Test
+    @DisplayName("Deve atualizar um livro com sucesso.")
+    void atualizar() {
+        Livro livroParaSerAtualizado = obterLivroComID();
+        Livro livroAtualizado = obterLivroComID();
+
+        given(livroRepository.save(livroParaSerAtualizado)).willReturn(livroAtualizado);
+
+        Livro resposta = livroService.atualizar(livroParaSerAtualizado);
+
+        assertThat(resposta).isNotNull();
+        assertThat(resposta.getId()).isEqualTo(ID);
+        assertThat(resposta.getTitulo()).isEqualTo(TITULO);
+        assertThat(resposta.getAutor()).isEqualTo(AUTOR);
+        assertThat(resposta.getIsbn()).isEqualTo(ISBN);
+    }
+
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
