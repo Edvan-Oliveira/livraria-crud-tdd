@@ -122,6 +122,21 @@ class LivroServiceTest {
         assertThat(resposta.get(1).getIsbn()).isEqualTo(OUTRO_ISBN);
     }
 
+    @Test
+    @DisplayName("Deve buscar livro por ID com sucesso.")
+    void buscarPorID() {
+        Livro livro = obterLivroComID();
+        given(livroRepository.findById(ID)).willReturn(Optional.of(livro));
+
+        Livro resposta = livroService.buscarPorID(ID);
+
+        assertThat(resposta).isNotNull();
+        assertThat(resposta.getId()).isEqualTo(ID);
+        assertThat(resposta.getTitulo()).isEqualTo(TITULO);
+        assertThat(resposta.getAutor()).isEqualTo(AUTOR);
+        assertThat(resposta.getIsbn()).isEqualTo(ISBN);
+    }
+
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }

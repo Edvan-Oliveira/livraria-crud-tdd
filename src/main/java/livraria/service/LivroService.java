@@ -35,7 +35,7 @@ public class LivroService {
     }
 
     public Livro buscarPorID(Integer id) {
-        return null;
+        return livroRepository.findById(id).get();
     }
 
     public void deletar(Integer id) {
