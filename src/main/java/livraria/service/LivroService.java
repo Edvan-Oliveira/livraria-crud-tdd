@@ -31,7 +31,7 @@ public class LivroService {
     }
 
     public List<Livro> listarTodos() {
-        return null;
+        return livroRepository.findAll();
     }
 
     public Livro buscarPorID(Integer id) {

@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -95,6 +96,30 @@ class LivroServiceTest {
         assertThatThrownBy(() -> livroService.atualizar(livroParaSerAtualizado))
                 .isInstanceOf(ISBNDuplicadoException.class)
                 .hasMessage(ISBN_DUPLICADO);
+    }
+
+    @Test
+    @DisplayName("Deve listar todos os livros com sucesso.")
+    void listarTodos() {
+        Livro primeiroLivro = obterLivroComID();
+        Livro segundoLivro = obterOutroLivroComID();
+        List<Livro> lista = List.of(primeiroLivro, segundoLivro);
+
+        given(livroRepository.findAll()).willReturn(lista);
+
+        List<Livro> resposta = livroService.listarTodos();
+
+        assertThat(resposta).isNotNull().isNotEmpty().hasSize(2);
+
+        assertThat(resposta.get(0).getId()).isEqualTo(ID);
+        assertThat(resposta.get(0).getTitulo()).isEqualTo(TITULO);
+        assertThat(resposta.get(0).getAutor()).isEqualTo(AUTOR);
+        assertThat(resposta.get(0).getIsbn()).isEqualTo(ISBN);
+
+        assertThat(resposta.get(1).getId()).isEqualTo(OUTRO_ID);
+        assertThat(resposta.get(1).getTitulo()).isEqualTo(OUTRO_TITULO);
+        assertThat(resposta.get(1).getAutor()).isEqualTo(OUTRO_AUTOR);
+        assertThat(resposta.get(1).getIsbn()).isEqualTo(OUTRO_ISBN);
     }
 
     private Livro obterLivroSemID() {
