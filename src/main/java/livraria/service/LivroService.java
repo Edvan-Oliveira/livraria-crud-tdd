@@ -2,6 +2,7 @@ package livraria.service;
 
 import livraria.domain.entity.Livro;
 import livraria.repository.LivroRepository;
+import livraria.service.exception.ConteudoNaoEncontradoException;
 import livraria.service.exception.ISBNDuplicadoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.Optional;
 public class LivroService {
 
     private static final String ISBN_DUPLICADO = "ISBN já cadastrado";
+    private static final String LIVRO_NAO_ENCONTRADO = "Livro não encontrado";
 
     private final LivroRepository livroRepository;
 
@@ -35,7 +37,8 @@ public class LivroService {
     }
 
     public Livro buscarPorID(Integer id) {
-        return livroRepository.findById(id).get();
+        return livroRepository.findById(id)
+                .orElseThrow(() -> new ConteudoNaoEncontradoException(LIVRO_NAO_ENCONTRADO));
     }
 
     public void deletar(Integer id) {

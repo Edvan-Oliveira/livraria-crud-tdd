@@ -2,6 +2,7 @@ package livraria.service;
 
 import livraria.domain.entity.Livro;
 import livraria.repository.LivroRepository;
+import livraria.service.exception.ConteudoNaoEncontradoException;
 import livraria.service.exception.ISBNDuplicadoException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import static org.mockito.BDDMockito.given;
 class LivroServiceTest {
 
     private static final String ISBN_DUPLICADO = "ISBN já cadastrado";
+    private static final String LIVRO_NAO_ENCONTRADO = "Livro não encontrado";
 
     private static final Integer ID = 8;
     private static final String TITULO = "Perfeito Livro";
@@ -135,6 +137,15 @@ class LivroServiceTest {
         assertThat(resposta.getTitulo()).isEqualTo(TITULO);
         assertThat(resposta.getAutor()).isEqualTo(AUTOR);
         assertThat(resposta.getIsbn()).isEqualTo(ISBN);
+    }
+
+    @Test
+    @DisplayName("Deve lançar a exceção ConteudoNaoEncontradoException ao tentar buscar por ID de livro inexistente.")
+    void buscarPorIDLivroInexistente() {
+        given(livroRepository.findById(ID)).willReturn(Optional.empty());
+        assertThatThrownBy(() -> livroService.buscarPorID(ID))
+                .isInstanceOf(ConteudoNaoEncontradoException.class)
+                .hasMessage(LIVRO_NAO_ENCONTRADO);
     }
 
     private Livro obterLivroSemID() {
