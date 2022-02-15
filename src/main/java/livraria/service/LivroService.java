@@ -7,20 +7,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class LivroService {
 
+    private static final String ISBN_DUPLICADO = "ISBN já cadastrado";
+
     private final LivroRepository livroRepository;
 
     public Livro cadastrar(Livro livro) {
         if (livroRepository.existsByIsbn(livro.getIsbn()))
-            throw new ISBNDuplicadoException("ISBN já cadastrado");
+            throw new ISBNDuplicadoException(ISBN_DUPLICADO);
         return livroRepository.save(livro);
     }
 
     public Livro atualizar(Livro livro) {
+        Optional<Livro> livroSalvo = livroRepository.findByIsbn(livro.getIsbn());
+        if (livroSalvo.isPresent() && !livroSalvo.get().getId().equals(livro.getId()))
+            throw new ISBNDuplicadoException(ISBN_DUPLICADO);
         return livroRepository.save(livro);
     }
 

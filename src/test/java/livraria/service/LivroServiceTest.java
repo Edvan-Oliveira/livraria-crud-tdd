@@ -10,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -23,6 +25,11 @@ class LivroServiceTest {
     private static final String TITULO = "Perfeito Livro";
     private static final String AUTOR = "Beltrano";
     private static final String ISBN = "452";
+
+    private static final Integer OUTRO_ID = 14;
+    private static final String OUTRO_TITULO = "Livro Novo";
+    private static final String OUTRO_AUTOR = "Xiluan";
+    private static final String OUTRO_ISBN = "984";
 
     @InjectMocks
     private LivroService livroService;
@@ -65,6 +72,7 @@ class LivroServiceTest {
         Livro livroParaSerAtualizado = obterLivroComID();
         Livro livroAtualizado = obterLivroComID();
 
+        given(livroRepository.findByIsbn(ISBN)).willReturn(Optional.empty());
         given(livroRepository.save(livroParaSerAtualizado)).willReturn(livroAtualizado);
 
         Livro resposta = livroService.atualizar(livroParaSerAtualizado);
@@ -76,11 +84,28 @@ class LivroServiceTest {
         assertThat(resposta.getIsbn()).isEqualTo(ISBN);
     }
 
+    @Test
+    @DisplayName("Deve lançar a exceção ISBNDuplicadoException ao tentar atualizar um livro com o ISBN de outro livro.")
+    void atualizarLivroComISBNExistente() {
+        Livro livroParaSerAtualizado = obterLivroComID();
+        Livro livroDonoDoISBN = obterOutroLivroComID();
+
+        given(livroRepository.findByIsbn(ISBN)).willReturn(Optional.of(livroDonoDoISBN));
+
+        assertThatThrownBy(() -> livroService.atualizar(livroParaSerAtualizado))
+                .isInstanceOf(ISBNDuplicadoException.class)
+                .hasMessage(ISBN_DUPLICADO);
+    }
+
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
 
     private Livro obterLivroComID() {
         return Livro.builder().id(ID).titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
+    }
+
+    private Livro obterOutroLivroComID() {
+        return Livro.builder().id(OUTRO_ID).titulo(OUTRO_TITULO).autor(OUTRO_AUTOR).isbn(OUTRO_ISBN).build();
     }
 }
