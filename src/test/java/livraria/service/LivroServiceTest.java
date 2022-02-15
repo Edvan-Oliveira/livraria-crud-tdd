@@ -17,6 +17,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class LivroServiceTest {
@@ -146,6 +149,20 @@ class LivroServiceTest {
         assertThatThrownBy(() -> livroService.buscarPorID(ID))
                 .isInstanceOf(ConteudoNaoEncontradoException.class)
                 .hasMessage(LIVRO_NAO_ENCONTRADO);
+    }
+
+    @Test
+    @DisplayName("Deve deletar um livro com sucesso.")
+    void deletar() {
+        Livro livroSalvo = obterLivroComID();
+
+        given(livroRepository.findById(ID)).willReturn(Optional.of(livroSalvo));
+        willDoNothing().given(livroRepository).delete(livroSalvo);
+
+        livroService.deletar(ID);
+
+        verify(livroRepository, times(1)).findById(ID);
+        verify(livroRepository, times(1)).delete(livroSalvo);
     }
 
     private Livro obterLivroSemID() {

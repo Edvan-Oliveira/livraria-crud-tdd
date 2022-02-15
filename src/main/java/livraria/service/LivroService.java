@@ -42,5 +42,6 @@ public class LivroService {
     }
 
     public void deletar(Integer id) {
+        livroRepository.delete(buscarPorID(id));
     }
 }
