@@ -53,6 +53,24 @@ class LivroRepositoryTest {
         assertThat(livroSalvo.getIsbn()).isEqualTo(ISBN);
     }
 
+    @Test
+    @DisplayName("Deve atualizar um livro com sucesso.")
+    void atualizar() {
+        Livro livroParaSerAtualizado = obterLivroSemID();
+        entityManager.persist(livroParaSerAtualizado);
+        String novoTitulo = TITULO.concat("!!!");
+        livroParaSerAtualizado.setTitulo(novoTitulo);
+
+        livroRepository.save(livroParaSerAtualizado);
+        Livro livroAtualizado = entityManager.find(Livro.class, livroParaSerAtualizado.getId());
+
+        assertThat(livroAtualizado).isNotNull();
+        assertThat(livroAtualizado.getId()).isEqualTo(livroParaSerAtualizado.getId());
+        assertThat(livroAtualizado.getTitulo()).isEqualTo(novoTitulo);
+        assertThat(livroAtualizado.getAutor()).isEqualTo(AUTOR);
+        assertThat(livroAtualizado.getIsbn()).isEqualTo(ISBN);
+    }
+
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
