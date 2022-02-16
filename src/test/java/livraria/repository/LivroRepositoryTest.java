@@ -7,12 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 class LivroRepositoryTest {
+
+    private static final String OUTRO_TITULO = "Patui Livro";
+    private static final String OUTRO_AUTOR = "Iutro";
+    private static final String OUTRO_ISBN = "654";
 
     private static final String TITULO = "Um Livro";
     private static final String AUTOR = "Ghuto";
@@ -71,7 +77,36 @@ class LivroRepositoryTest {
         assertThat(livroAtualizado.getIsbn()).isEqualTo(ISBN);
     }
 
+    @Test
+    @DisplayName("Deve listar todos os livros com sucesso.")
+    void listarTodos() {
+        Livro primeiroLivro = obterLivroSemID();
+        Livro segundoLivro = obterOutroLivroSemID();
+
+        entityManager.persist(primeiroLivro);
+        entityManager.persist(segundoLivro);
+
+        List<Livro> lista = livroRepository.findAll();
+
+        assertThat(lista).isNotNull().isNotEmpty().hasSize(2);
+
+        assertThat(lista.get(0).getId()).isEqualTo(primeiroLivro.getId());
+        assertThat(lista.get(0).getTitulo()).isEqualTo(TITULO);
+        assertThat(lista.get(0).getAutor()).isEqualTo(AUTOR);
+        assertThat(lista.get(0).getIsbn()).isEqualTo(ISBN);
+
+        assertThat(lista.get(1).getId()).isEqualTo(segundoLivro.getId());
+        assertThat(lista.get(1).getTitulo()).isEqualTo(OUTRO_TITULO);
+        assertThat(lista.get(1).getAutor()).isEqualTo(OUTRO_AUTOR);
+        assertThat(lista.get(1).getIsbn()).isEqualTo(OUTRO_ISBN);
+
+    }
+
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
+    }
+
+    private Livro obterOutroLivroSemID() {
+        return Livro.builder().titulo(OUTRO_TITULO).autor(OUTRO_AUTOR).isbn(OUTRO_ISBN).build();
     }
 }
