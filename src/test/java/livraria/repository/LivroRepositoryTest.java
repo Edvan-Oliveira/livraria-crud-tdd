@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -37,6 +38,19 @@ class LivroRepositoryTest {
     void verificarSeISBNNaoExiste() {
         boolean resposta = livroRepository.existsByIsbn(ISBN);
         assertFalse(resposta);
+    }
+
+    @Test
+    @DisplayName("Deve cadastrar um livro com sucesso.")
+    void cadastrar() {
+        Livro livroParaSerSalvo = obterLivroSemID();
+        Livro livroSalvo = livroRepository.save(livroParaSerSalvo);
+
+        assertThat(livroSalvo).isNotNull();
+        assertThat(livroSalvo.getId()).isNotNull();
+        assertThat(livroSalvo.getTitulo()).isEqualTo(TITULO);
+        assertThat(livroSalvo.getAutor()).isEqualTo(AUTOR);
+        assertThat(livroSalvo.getIsbn()).isEqualTo(ISBN);
     }
 
     private Livro obterLivroSemID() {
