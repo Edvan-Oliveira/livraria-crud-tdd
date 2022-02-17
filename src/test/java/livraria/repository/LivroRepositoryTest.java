@@ -21,6 +21,7 @@ class LivroRepositoryTest {
     private static final String OUTRO_AUTOR = "Iutro";
     private static final String OUTRO_ISBN = "654";
 
+    private static final Integer ID =  17;
     private static final String TITULO = "Um Livro";
     private static final String AUTOR = "Ghuto";
     private static final String ISBN = "357";
@@ -122,6 +123,13 @@ class LivroRepositoryTest {
         assertThat(livroSalvo.get().getTitulo()).isEqualTo(TITULO);
         assertThat(livroSalvo.get().getAutor()).isEqualTo(AUTOR);
         assertThat(livroSalvo.get().getIsbn()).isEqualTo(ISBN);
+    }
+
+    @Test
+    @DisplayName("Deve retornar vazio ao tentar buscar por ID de um livro que não existe.")
+    void buscaPorIDLivroInexistente() {
+        Optional<Livro> resultado = livroRepository.findById(ID);
+        assertThat(resultado.isEmpty()).isTrue();
     }
 
     private Livro obterLivroSemID() {
