@@ -99,7 +99,13 @@ class LivroRepositoryTest {
         assertThat(lista.get(1).getTitulo()).isEqualTo(OUTRO_TITULO);
         assertThat(lista.get(1).getAutor()).isEqualTo(OUTRO_AUTOR);
         assertThat(lista.get(1).getIsbn()).isEqualTo(OUTRO_ISBN);
+    }
 
+    @Test
+    @DisplayName("Deve retornar uma lista vazia.")
+    void listarTodosComListaVazia() {
+        List<Livro> lista = livroRepository.findAll();
+        assertThat(lista).isNotNull().isEmpty();
     }
 
     private Livro obterLivroSemID() {
