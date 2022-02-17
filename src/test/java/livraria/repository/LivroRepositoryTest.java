@@ -132,6 +132,17 @@ class LivroRepositoryTest {
         assertThat(resultado.isEmpty()).isTrue();
     }
 
+    @Test
+    @DisplayName("Deve deletar um livro com sucesso.")
+    void deletar() {
+        Livro livroParaSerSalvo = obterLivroSemID();
+        entityManager.persist(livroParaSerSalvo);
+        livroRepository.deleteById(livroParaSerSalvo.getId());
+        Livro livroDeletado = entityManager.find(Livro.class, livroParaSerSalvo.getId());
+        assertThat(livroDeletado).isNull();
+    }
+
+
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
