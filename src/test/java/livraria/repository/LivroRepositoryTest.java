@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -106,6 +107,21 @@ class LivroRepositoryTest {
     void listarTodosComListaVazia() {
         List<Livro> lista = livroRepository.findAll();
         assertThat(lista).isNotNull().isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve buscar um livro por ID com sucesso.")
+    void buscarPorID() {
+        Livro livroParaSerSalvo = obterLivroSemID();
+        entityManager.persist(livroParaSerSalvo);
+
+        Optional<Livro> livroSalvo = livroRepository.findById(livroParaSerSalvo.getId());
+
+        assertThat(livroSalvo).isPresent();
+        assertThat(livroSalvo.get().getId()).isEqualTo(livroParaSerSalvo.getId());
+        assertThat(livroSalvo.get().getTitulo()).isEqualTo(TITULO);
+        assertThat(livroSalvo.get().getAutor()).isEqualTo(AUTOR);
+        assertThat(livroSalvo.get().getIsbn()).isEqualTo(ISBN);
     }
 
     private Livro obterLivroSemID() {
