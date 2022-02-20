@@ -142,7 +142,6 @@ class LivroRepositoryTest {
         assertThat(livroDeletado).isNull();
     }
 
-
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
