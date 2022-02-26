@@ -104,6 +104,19 @@ public class LivroResourceIntegrationTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @DisplayName("Deve buscar livro por ID com sucesso.")
+    void buscarPorID() throws Exception {
+        Livro livroParaSerSalvo = obterLivroSemID();
+        entityManager.persist(livroParaSerSalvo);
+
+        MockHttpServletRequestBuilder requisicao = get(URL_API_ID)
+                .accept(APPLICATION_JSON);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isOk());
+    }
+
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
