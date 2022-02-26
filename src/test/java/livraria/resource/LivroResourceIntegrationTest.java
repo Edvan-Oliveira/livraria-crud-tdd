@@ -2,33 +2,52 @@ package livraria.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import livraria.domain.request.LivroPostRequest;
+import livraria.domain.request.LivroPutRequest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
+@AutoConfigureTestEntityManager
+@ActiveProfiles("test")
 @Transactional
 public class LivroResourceIntegrationTest {
 
-    private static final String URL_API = "/livros";
-
+    private static final Integer ID = 1;
     private static final String TITULO = "Livro Demais";
     private static final String AUTOR = "DH";
     private static final String ISBN = "985";
 
+    private static final String URL_API = "/livros";
+    private static final String URL_API_ID = URL_API.concat("/").concat(ID.toString());
+
     @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    private TestEntityManager entityManager;
+
+    @BeforeEach
+    void limparBancoDeDados() {
+        entityManager.getEntityManager()
+                .createNativeQuery("TRUNCATE livro RESTART IDENTITY")
+                .executeUpdate();
+    }
 
     @Test
     @DisplayName("Deve cadastrar um livro com sucesso.")
@@ -45,11 +64,33 @@ public class LivroResourceIntegrationTest {
                 .andExpect(status().isCreated());
     }
 
+    @Test
+    @DisplayName("Deve atualizar um livro com sucesso.")
+    void atualizar() throws Exception {
+        LivroPutRequest livroPutRequest = obterLivroPutRequest();
+        livroPutRequest.setAutor(AUTOR.concat(" Mendes"));
+        livroPutRequest.setTitulo(TITULO.concat("!!!"));
+
+        String livroPutRequestJSON = converterParaJSON(livroPutRequest);
+
+        MockHttpServletRequestBuilder requisicao = put(URL_API_ID)
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .content(livroPutRequestJSON);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isOk());
+    }
+
     private LivroPostRequest obterLivroPostRequest() {
         return LivroPostRequest.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
 
     private String converterParaJSON(Object objeto) throws Exception {
         return new ObjectMapper().writeValueAsString(objeto);
+    }
+
+    private LivroPutRequest obterLivroPutRequest() {
+        return LivroPutRequest.builder().id(ID).titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
 }
