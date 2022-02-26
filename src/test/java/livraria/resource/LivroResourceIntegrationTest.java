@@ -117,6 +117,18 @@ public class LivroResourceIntegrationTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @DisplayName("Deve deletar livro com sucesso.")
+    void deletar() throws Exception {
+        Livro livroParaSerSalvo = obterLivroSemID();
+        entityManager.persist(livroParaSerSalvo);
+
+        MockHttpServletRequestBuilder requisicao = delete(URL_API_ID);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isNoContent());
+    }
+
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
