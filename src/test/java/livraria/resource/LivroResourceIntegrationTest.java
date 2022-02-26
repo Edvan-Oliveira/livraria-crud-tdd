@@ -18,8 +18,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -33,6 +32,10 @@ public class LivroResourceIntegrationTest {
     private static final String TITULO = "Livro Demais";
     private static final String AUTOR = "DH";
     private static final String ISBN = "985";
+
+    private static final String OUTRO_TITULO = "Livro Ok";
+    private static final String OUTRO_AUTOR = "Pou Ho";
+    private static final String OUTRO_ISBN = "112";
 
     private static final String URL_API = "/livros";
     private static final String URL_API_ID = URL_API.concat("/").concat(ID.toString());
@@ -86,8 +89,27 @@ public class LivroResourceIntegrationTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @DisplayName("Deve listar todos os livros com sucesso.")
+    void listarTodos() throws Exception {
+        Livro primeiroLivro = obterLivroSemID();
+        Livro segundoLivro = obterOutroLivroSemID();
+        entityManager.persist(primeiroLivro);
+        entityManager.persist(segundoLivro);
+
+        MockHttpServletRequestBuilder requisicao = get(URL_API)
+                .accept(APPLICATION_JSON);
+
+        mvc.perform(requisicao)
+                .andExpect(status().isOk());
+    }
+
     private Livro obterLivroSemID() {
         return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
+    }
+
+    private Livro obterOutroLivroSemID() {
+        return Livro.builder().titulo(OUTRO_TITULO).autor(OUTRO_AUTOR).isbn(OUTRO_ISBN).build();
     }
 
     private LivroPostRequest obterLivroPostRequest() {
