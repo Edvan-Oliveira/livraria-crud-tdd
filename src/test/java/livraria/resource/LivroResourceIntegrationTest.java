@@ -1,6 +1,7 @@
 package livraria.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import livraria.domain.entity.Livro;
 import livraria.domain.request.LivroPostRequest;
 import livraria.domain.request.LivroPutRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,6 +68,9 @@ public class LivroResourceIntegrationTest {
     @Test
     @DisplayName("Deve atualizar um livro com sucesso.")
     void atualizar() throws Exception {
+        Livro livroParaSerSalvo = obterLivroSemID();
+        entityManager.persist(livroParaSerSalvo);
+
         LivroPutRequest livroPutRequest = obterLivroPutRequest();
         livroPutRequest.setAutor(AUTOR.concat(" Mendes"));
         livroPutRequest.setTitulo(TITULO.concat("!!!"));
@@ -80,6 +84,10 @@ public class LivroResourceIntegrationTest {
 
         mvc.perform(requisicao)
                 .andExpect(status().isOk());
+    }
+
+    private Livro obterLivroSemID() {
+        return Livro.builder().titulo(TITULO).autor(AUTOR).isbn(ISBN).build();
     }
 
     private LivroPostRequest obterLivroPostRequest() {
