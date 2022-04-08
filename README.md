@@ -121,7 +121,7 @@ Com as configurações de desenvolvedor, o banco de dados utilizado será o [Pos
 
 Com todos os programas devidamente instalados, segue as instruções:
 
-1 - Primeiro é preciso criar um banco de dados chamado _livraria-crud-tdd_ no [PostgreSQL](https://www.postgrescompare.com/).
+1 - Primeiro é preciso criar um banco de dados chamado _livraria_crud_tdd_ no [PostgreSQL](https://www.postgrescompare.com/).
 
 ```sql
     CREATE DATABASE livraria_crud_tdd ENCODING 'UTF8';
