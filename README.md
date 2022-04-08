@@ -124,7 +124,7 @@ Com todos os programas devidamente instalados, segue as instruções:
 1 - Primeiro é preciso criar um banco de dados chamado _livraria-crud-tdd_ no [PostgreSQL](https://www.postgrescompare.com/).
 
 ```sql
-    CREATE DATABASE livraria-crud-tdd ENCODING 'UTF8';
+    CREATE DATABASE livraria_crud_tdd ENCODING 'UTF8';
 ```
 
 2- Em seguida é necessário criar o usuário com permissão de login, o nome será _adm_ e a senha _123456_.
