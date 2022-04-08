@@ -1,3 +1,5 @@
+[![Build Status](https://app.travis-ci.com/Edvan-Oliveira/livraria-crud-tdd.svg?branch=main)](https://app.travis-ci.com/Edvan-Oliveira/livraria-crud-tdd)
+
 # 📝 Sobre
 
 Este é um projeto de um CRUD de uma API REST desenvolvida com a técnica do TDD (Test Driven Development/Desenvolvimento Orientado por Testes).
