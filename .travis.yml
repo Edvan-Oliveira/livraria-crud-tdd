@@ -23,3 +23,5 @@ env:
 before_script:
   - sudo psql -p 5433 -U postgres -c 'create database teste_livraria_crud_tdd;'
   - sudo psql -p 5433 -U postgres -c "create role adm with login superuser password '123456';"
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
