@@ -1,4 +1,4 @@
-[![Build Status](https://app.travis-ci.com/Edvan-Oliveira/livraria-crud-tdd.svg?branch=main)](https://app.travis-ci.com/Edvan-Oliveira/livraria-crud-tdd)
+[![Build Status](https://app.travis-ci.com/Edvan-Oliveira/livraria-crud-tdd.svg?branch=main)](https://app.travis-ci.com/Edvan-Oliveira/livraria-crud-tdd)   [![codecov](https://codecov.io/gh/Edvan-Oliveira/livraria-crud-tdd/branch/main/graph/badge.svg?token=DW65RGT6Q1)](https://codecov.io/gh/Edvan-Oliveira/livraria-crud-tdd)
 
 # 📝 Sobre
 
